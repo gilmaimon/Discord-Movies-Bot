@@ -1,7 +1,11 @@
 import aiohttp
 import asyncio
 import json
+import re
+from .movie import Movie
 
+# Class for representing yst.am specific response
+# Reoresents a single movie object in it's minimal form
 class MovieSnippet:
     def __init__(self, title, year, img, url):
         self.title = title
@@ -20,6 +24,7 @@ class MovieSnippet:
         url = data['url']
         return MovieSnippet(title, year, img, url)
 
+# Class for representing a response from yst.am search API
 class QueryResponse:
     def __init__(self, status, movies):
         self.status = status
@@ -37,6 +42,7 @@ class QueryResponse:
             movies = []
         return QueryResponse(status, movies)
 
+# Search movies and parse response to QueryResponse
 async def fetch_movies(session, query):
     params = {'query': query}
     async with session.get('https://yts.am/ajax/search', params=params) as response:
@@ -44,9 +50,7 @@ async def fetch_movies(session, query):
         bodyJson = json.loads(body)
         return QueryResponse.fromJson(bodyJson)
 
-import re
-from movie import Movie
-
+# Fetch all movie details from yst.am (for a specific movie's url)
 async def fetch_whole_movie(session, url):
     async with session.get(url) as response:
         body = await response.text()
@@ -56,16 +60,19 @@ async def fetch_whole_movie(session, url):
         downloads = [res for res in filter(lambda x: 'span' not in x[1], re.findall('<a href="(.+)" rel="nofollow" title=".+">(.+)</a>', body))]
         downloads = [{'url': x[0], 'title': x[1]} for x in downloads]
         thumbnails = re.findall(r"""<div id="movie-poster".*?><img.*?src=\"(.+?)\" .*?</div>""", body.replace('\n', ''))
-        print(thumbnails)
         return Movie(title, year, genere, description, thumbnails[0], downloads, url)
 
-async def search_titles(query, snippet=False):
-    async with aiohttp.ClientSession() as session:
-        queryResponse = await fetch_movies(session, query)
-        moviesSorted = sorted(queryResponse.movies, key = lambda x: (abs(len(x.title) - len(query)), x.title) )
-        if snippet:
-            return moviesSorted
-        movies = []
-        for movie in moviesSorted:
-            movies += [await fetch_whole_movie(session, movie.url)]
-        return movies
+class YstAmProvider:
+    def __init__(self):
+        pass
+
+    # The common provider method to search movies
+    # Returns a list of Movie objects    
+    async def search_movies(self, query):
+        async with aiohttp.ClientSession() as session:
+            queryResponse = await fetch_movies(session, query)
+            moviesSorted = sorted(queryResponse.movies, key = lambda x: (abs(len(x.title) - len(query)), x.title, int(x.year) * -1) )
+            movies = []
+            for movie in moviesSorted:
+                movies += [await fetch_whole_movie(session, movie.url)]
+            return movies
