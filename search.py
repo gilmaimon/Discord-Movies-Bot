@@ -62,10 +62,10 @@ async def fetch_whole_movie(session, url):
 async def search_titles(query, snippet=False):
     async with aiohttp.ClientSession() as session:
         queryResponse = await fetch_movies(session, query)
+        moviesSorted = sorted(queryResponse.movies, key = lambda x: abs(len(x.title) - len(query)))
         if snippet:
-            return queryResponse.movies
+            return moviesSorted
         movies = []
-        for movie in queryResponse.movies:
+        for movie in moviesSorted:
             movies += [await fetch_whole_movie(session, movie.url)]
         return movies
-        
