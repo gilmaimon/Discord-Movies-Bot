@@ -6,11 +6,12 @@ from search import search_titles
 
 client = discord.Client()
 
-def constructMovieEmbed(movie):
+def constructMovieEmbed(movie, also=[]):
     embed = discord.Embed(title='{} | {}'.format(movie.name, str(movie.year)), description=movie.description)
     embed.set_thumbnail(url=movie.thumbnail)
     for download in movie.downloads:
         embed.add_field(name=download['title'], value="[Download]({})".format(download['url']), inline=False)
+    embed.set_footer(text="Did you mean:\n" + ', '.join([m.name for m in also]))
     return embed
 
 @client.event
@@ -31,6 +32,7 @@ async def on_message(message):
         elif len(movies) == 1:
             await client.edit_message(tmp, 'Got It!', embed=constructMovieEmbed(movies[0]))
         elif len(movies) > 1:
-            await client.edit_message(tmp, 'Found some, here is the best one', embed=constructMovieEmbed(movies[0]))
+            alsoFound = movies[1:]
+            await client.edit_message(tmp, 'Found some, here is the best one', embed=constructMovieEmbed(movies[0], also=alsoFound))
 
 client.run(token)
