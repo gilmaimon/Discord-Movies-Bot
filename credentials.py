@@ -1,1 +1,0 @@
-token = 'THIS-IS-A-SECRET'
