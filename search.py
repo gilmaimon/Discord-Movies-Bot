@@ -55,7 +55,7 @@ async def fetch_whole_movie(session, url):
         description = re.findall('<p class="hidden-xs">(.+)</p>', body)[0].strip()
         downloads = [res for res in filter(lambda x: 'span' not in x[1], re.findall('<a href="(.+)" rel="nofollow" title=".+">(.+)</a>', body))]
         downloads = [{'url': x[0], 'title': x[1]} for x in downloads]
-        thumbnails = re.findall("""<div id="movie-poster".*?><img.*?src=\"(.+?)\" .*?<\/div>""", body.replace('\n', ''))
+        thumbnails = re.findall(r"""<div id="movie-poster".*?><img.*?src=\"(.+?)\" .*?</div>""", body.replace('\n', ''))
         print(thumbnails)
         return Movie(title, year, genere, description, thumbnails[0], downloads, url)
 
