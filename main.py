@@ -14,10 +14,10 @@ async def on_ready():
     print('------')
 
 def constructMovieEmbed(movie):
-    embed = discord.Embed(title=movie.name, description=movie.description)
+    embed = discord.Embed(title='{} | {}'.format(movie.name, str(movie.year)), description=movie.description)
     embed.set_thumbnail(url=movie.thumbnail)
     for download in movie.downloads:
-        embed.add_field(name=download['title'], value="[Download]({})".format(download['link']), inline=False)
+        embed.add_field(name=download['title'], value="[Download]({})".format(download['url']), inline=False)
     return embed
 
 @client.event
@@ -25,7 +25,13 @@ async def on_message(message):
     if message.content.startswith('!movie'):
         query = message.content[len('!movie') + 1:]
         tmp = await client.send_message(message.channel, 'Proccessing...')
-        query_result = await search_titles(query)
-        await client.edit_message(tmp, '\n'.join([str(m.url) for m in query_result.movies]))
+        movies = await search_titles(query)
+        if len(movies) == 0:
+            await client.edit_message(tmp, "Sorry, I didn't find anything.")
+        elif len(movies) == 1:
+            await client.edit_message(tmp, 'Got It!', embed=constructMovieEmbed(movies[0]))
+        elif len(movies) > 1:
+            # sort by distance or num chars
+            await client.edit_message(tmp, 'Found some, here is the best one', embed=constructMovieEmbed(movies[0]))
 
 client.run(token)
