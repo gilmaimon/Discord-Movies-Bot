@@ -21,7 +21,11 @@ class MoviesBot:
     def __get_embed_for_query_result(movie, also=[]):
         # Title and Description
         formatted_title = '{} | {}'.format(movie.title, str(movie.year))
-        embed = discord.Embed(title=formatted_title, description=movie.description)
+        
+        description = movie.description + '\n'
+        description += "View on [IMDB](https://www.imdb.com/title/{})".format(movie.imdb_id)
+        
+        embed = discord.Embed(title=formatted_title, description=description)
         
         # Thumbnail
         embed.set_thumbnail(url=movie.thumbnail)

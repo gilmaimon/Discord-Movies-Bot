@@ -60,7 +60,8 @@ async def fetch_whole_movie(session, url):
         downloads = [res for res in filter(lambda x: 'span' not in x[1], re.findall('<a href="(.+)" rel="nofollow" title=".+">(.+)</a>', body))]
         downloads = [{'url': x[0], 'title': x[1]} for x in downloads]
         thumbnails = re.findall(r"""<div id="movie-poster".*?><img.*?src=\"(.+?)\" .*?</div>""", body.replace('\n', ''))
-        return Movie(title, year, genere, description, thumbnails[0], downloads, url)
+        imdb_id = re.findall(r"""<a class="icon" href="https://www.imdb.com/title/(.+)/".*>""", body)[0]
+        return Movie(title, year, genere, description, thumbnails[0], downloads, url, imdb_id)
 
 class YstAmProvider:
     def __init__(self):
