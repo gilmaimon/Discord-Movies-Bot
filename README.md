@@ -1,7 +1,7 @@
 [![Python 3.6](https://img.shields.io/badge/python-3.6-blue.svg)](https://www.python.org/downloads/release/python-360/)
-# Discord-Movies-Bot
+# Discord Movies Bot
 
-A discord bot to fetch torrent downloads and subtitles for movies. In chat write `!movies NAME` 
+A discord bot to fetch torrent downloads and subtitles for movies. In chat write `!movies NAME` and the bot will respond with torrent links and some info about the movie.
 
 <img src="https://github.com/gilmaimon/Discord-Movies-Bot/blob/master/screenshots/1.PNG">
 
