@@ -1,4 +1,6 @@
 """
+    Entity to represent a fully known and fetched movie.
+    
     @title String -> the movie title
     @year int -> the movie release year
     @genere String -> the generes of the movie (free text)

@@ -6,9 +6,10 @@ class MoviesBot:
         @token String -> the api token for the Discord API
         @movies_provider -> allows searching movies
     """
-    def __init__(self, token, movies_provider):
+    def __init__(self, token, movies_provider, subtitles_provider):
         self.__token = token
-        self.__provider = movies_provider
+        self.__movies_provider = movies_provider
+        self.__subtitles_provider = subtitles_provider
         self.__client = discord.Client()
 
         @self.__client.event
@@ -73,7 +74,7 @@ class MoviesBot:
             # Query movies
             query = self.get_query_from_command(message)
             tmp = await self.__client.send_message(message.channel, 'Proccessing...')
-            movies = await self.__provider.search_movies(query)
+            movies = await self.__movies_provider.search_movies(query)
             
             # If no movies were found
             if len(movies) == 0:
