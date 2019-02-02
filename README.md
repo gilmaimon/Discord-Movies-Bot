@@ -3,7 +3,9 @@
 
 A discord bot to fetch torrent downloads and subtitles for movies. In chat write `!movies NAME` and the bot will respond with torrent links and some info about the movie.
 
-<div style="text-align:center"><img src ="https://github.com/gilmaimon/Discord-Movies-Bot/blob/master/screenshots/1.PNG" /></div>
+<p align="center">
+  <img src ="https://github.com/gilmaimon/Discord-Movies-Bot/blob/master/screenshots/1.PNG" />
+</p>
 
 ## Getting Started
 
