@@ -2,6 +2,7 @@ import aiohttp
 import asyncio
 import json
 import re
+
 from .movie import Movie
 
 # Class for representing yst.am specific response

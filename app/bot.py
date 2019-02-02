@@ -19,7 +19,7 @@ class MoviesBot:
         async def on_message(message): await self.handle_message(message)
 
     @staticmethod
-    def __get_embed_for_query_result(movie, also=[]):
+    def __get_embed_for_query_result(movie, subs, also=[]):
         # Title and Description
         formatted_title = '{} | {}'.format(movie.title, str(movie.year))
         
@@ -36,6 +36,9 @@ class MoviesBot:
             download_link = "[Download]({})".format(download['url'])
             embed.add_field(name=download['title'], value=download_link, inline=False)
         
+        if subs:
+            embed.add_field(name="{} Subtitles".format(subs.language), value="[Download Subs]({})".format(subs.download_url))
+
         # Footer (Other search options)
         if len(also) > 0:
             other_options = ', '.join(['{} ({})'.format(m.title, m.year) for m in also])
@@ -83,13 +86,17 @@ class MoviesBot:
             # If only found one movie, return it as single result
             elif len(movies) == 1:
                 # construct message and present it
-                embed = self.__get_embed_for_query_result(movies[0])
+                selected_movie = movies[0]
+                subtitles = await self.__subtitles_provider.search_subtitles(selected_movie)
+                embed = self.__get_embed_for_query_result(selected_movie, subs=subtitles)
                 await self.__client.edit_message(tmp, 'Got It!', embed=embed)
             # If found multiple movies, return the best one and other as hints
             elif len(movies) > 1:
+                selected_movie = movies[0]
+                subtitles = await self.__subtitles_provider.search_subtitles(selected_movie)
                 alsoFound = movies[1:]
                 # construct message and present it
-                embed = self.__get_embed_for_query_result(movies[0], also=alsoFound)
+                embed = self.__get_embed_for_query_result(selected_movie, subs=subtitles, also=alsoFound)
                 await self.__client.edit_message(tmp, 'Found some, here is the best one', embed=embed)
 
     def start(self):
