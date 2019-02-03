@@ -20,3 +20,10 @@ class Movie(object):
         self.downloads = downloads
         self.original_url = original_url
         self.imdb_id = imdb_id
+
+    @staticmethod
+    def minimal(title, year):
+        return Movie(title, year, None, None, None, None, None, None)
+
+    def __str__(self):
+        return "Movie: {} ({}). imdb_id: {}".format(self.title, self.year, self.imdb_id)

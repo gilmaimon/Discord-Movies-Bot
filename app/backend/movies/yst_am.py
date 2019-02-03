@@ -75,6 +75,11 @@ class YstAmProvider:
             queryResponse = await fetch_movies(session, query)
             moviesSorted = sorted(queryResponse.movies, key = lambda x: (abs(len(x.title) - len(query)), x.title, int(x.year) * -1) )
             movies = []
-            for movie in moviesSorted:
-                movies += [await fetch_whole_movie(session, movie.url)]
+            for iMovie in range(len(moviesSorted)):
+                movie = moviesSorted[iMovie]
+                if iMovie == 0:
+                    wholeMovieData = await fetch_whole_movie(session, movie.url)
+                    movies.append(wholeMovieData)
+                else:
+                    movies.append(Movie.minimal(movie.title, movie.year))
             return movies
