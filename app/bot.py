@@ -71,33 +71,40 @@ class MoviesBot:
         # Remove first word
         words = content.split(' ')
         return ' '.join(words[1:])
+    
+    async def discord_response_for_query(self, query):
+        movies = await self.__movies_provider.search_movies(query)
+        # If no movies were found
+        if len(movies) == 0:
+            # present message
+            return "Sorry, I didn't find anything.", None
+        
+        selected_movie = movies[0]
+        subtitles = await self.__subtitles_provider.search_subtitles(selected_movie)
+        # If only found one movie, return it as single result
+        if len(movies) == 1:
+            # construct message and present it
+            embed = self.__get_embed_for_query_result(selected_movie, subs=subtitles)
+            return 'Got It!', embed
+        # If found multiple movies, return the best one and other as hints
+        elif len(movies) > 1:
+            alsoFound = movies[1:]
+            # construct message and present it
+            embed = self.__get_embed_for_query_result(selected_movie, subs=subtitles, also=alsoFound)
+            return'Found some, here is the best one', embed
 
     async def handle_message(self, message):
         if self.is_movies_request(message):
             # Query movies
             query = self.get_query_from_command(message)
             tmp = await self.__client.send_message(message.channel, 'Proccessing...')
-            movies = await self.__movies_provider.search_movies(query)
+            try:
+                body, embed = await self.discord_response_for_query(query)
+            except:
+                print("Error Occured")
+                body, embed = "Oops. Something went wrong.", None
             
-            # If no movies were found
-            if len(movies) == 0:
-                # present message
-                await self.__client.edit_message(tmp, "Sorry, I didn't find anything.")
-            # If only found one movie, return it as single result
-            elif len(movies) == 1:
-                # construct message and present it
-                selected_movie = movies[0]
-                subtitles = await self.__subtitles_provider.search_subtitles(selected_movie)
-                embed = self.__get_embed_for_query_result(selected_movie, subs=subtitles)
-                await self.__client.edit_message(tmp, 'Got It!', embed=embed)
-            # If found multiple movies, return the best one and other as hints
-            elif len(movies) > 1:
-                selected_movie = movies[0]
-                subtitles = await self.__subtitles_provider.search_subtitles(selected_movie)
-                alsoFound = movies[1:]
-                # construct message and present it
-                embed = self.__get_embed_for_query_result(selected_movie, subs=subtitles, also=alsoFound)
-                await self.__client.edit_message(tmp, 'Found some, here is the best one', embed=embed)
+            await self.__client.edit_message(tmp, body, embed=embed)
 
     def start(self):
         # start the bot
