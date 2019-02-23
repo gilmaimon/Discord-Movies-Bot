@@ -32,6 +32,7 @@ class YifySubtitlesPorivder:
         conn = aiohttp.TCPConnector(family=socket.AF_INET)
         async with aiohttp.ClientSession(connector=conn) as session:
             all_subs = await get_all_subtitles(movie.title, movie.imdb_id, session)
+            await session.close()
             for subs in all_subs:
                 if subs.language == self.language:
                     return subs

@@ -36,5 +36,6 @@ class OpenSubsProvider:
         conn = aiohttp.TCPConnector(family=socket.AF_INET)
         async with aiohttp.ClientSession(connector=conn) as session:
             all_subs = await get_subtitles_for_langid(movie.title, movie.imdb_id, self.lanauage, session)
+            await session.close()
             if len(all_subs) > 0: return all_subs[0]
             else: return None

@@ -73,6 +73,7 @@ class YstAmProvider:
     async def search_movies(self, query):
         async with aiohttp.ClientSession() as session:
             queryResponse = await fetch_movies(session, query)
+            await session.close()
             moviesSorted = sorted(queryResponse.movies, key = lambda x: (abs(len(x.title) - len(query)), x.title, int(x.year) * -1) )
             movies = []
             for iMovie in range(len(moviesSorted)):
